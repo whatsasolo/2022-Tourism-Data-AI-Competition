@@ -22,7 +22,7 @@ import math
 import time
 
 device = torch.device('mps')
-data_path = './'
+data_path = './data/'
 tokenizer = AutoTokenizer.from_pretrained("klue/roberta-large", padding_side = 'left')
 feature_extractor = ViTFeatureExtractor.from_pretrained('google/vit-large-patch32-384')
 
@@ -367,7 +367,7 @@ if __name__ == '__main__':
     # dataset_train_part = MNIST(os.getcwd(), download=True, transform=transforms.ToTensor(), train=True)
     # dataset_test_part = MNIST(os.getcwd(), download=True, transform=transforms.ToTensor(), train=False)
     # dataset = ConcatDataset([dataset_train_part, dataset_test_part])
-    dataset = pd.read_csv(f'{data_path}/train_csv')
+    dataset = pd.read_csv(f'{data_path}train.csv')
     le = preprocessing.LabelEncoder()
     le.fit(dataset.cat3.values)
     dataset.cat3 = le.transform(dataset.cat3.values)
@@ -383,7 +383,7 @@ if __name__ == '__main__':
     print('--------------------------------')
 
     # K-fold Cross Validation model evaluation
-    for fold, (train_ids, valid_ids) in enumerate(kfold.split(dataset)):
+    for fold, (train_ids, valid_ids) in enumerate(kfold.split(dataset, dataset['cat3'])):
 
         train_data_loader = create_data_loader(
                                 dataset.iloc[train_ids], 
@@ -417,7 +417,7 @@ if __name__ == '__main__':
                           image_model_name = 'google/vit-large-patch32-384'
                           ).to(device)
         network.apply(reset_weights)
-            
+        total_steps = len(train_data_loader) * num_epochs    
         # Initialize optimizer
         # optimizer = torch.optim.Adam(network.parameters(), lr=1e-4)
         optimizer = optim.AdamW(network.parameters(), lr= 3e-5)
@@ -425,7 +425,7 @@ if __name__ == '__main__':
                                                 num_warmup_steps = int(total_steps*0.1),
                                                 num_training_steps = total_steps
                                                )
-        total_steps = len(train_data_loader) * num_epochs
+        
         # 여기까지 했음 10월 30일 8시 25분
         # commit here 30, Oct, 8:25 AM 
 
@@ -488,7 +488,7 @@ if __name__ == '__main__':
                             # text_model_name = 'klue/roberta-large',
                             # image_model_name = 'google/vit-large-patch32-384'
                             # ).to(device)
-    test = pd.read_csv(f'{data_path}/train.csv')
+    test = pd.read_csv(f'{data_path}test.csv')
 
     saved_model_list = [file for file in os.listdir(data_path) if file.endswith('pt')]
     for s in saved_model_list:
