@@ -49,6 +49,7 @@ def calc_tour_acc(pred, label):
     f1_acc = f1_score(x, y, average='weighted')
     return acc,f1_acc
 
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
     def __init__(self):
@@ -65,6 +66,7 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
+
 
 def asMinutes(s):
     m = math.floor(s / 60)
@@ -367,10 +369,6 @@ if __name__ == '__main__':
     # Set fixed random number seed
     torch.manual_seed(42)
   
-    # Prepare MNIST dataset by concatenating Train/Test part; we split later.
-    # dataset_train_part = MNIST(os.getcwd(), download=True, transform=transforms.ToTensor(), train=True)
-    # dataset_test_part = MNIST(os.getcwd(), download=True, transform=transforms.ToTensor(), train=False)
-    # dataset = ConcatDataset([dataset_train_part, dataset_test_part])
     dataset = pd.read_csv(f'{data_path}train.csv')
     le = preprocessing.LabelEncoder()
     le.fit(dataset.cat3.values)
@@ -402,17 +400,8 @@ if __name__ == '__main__':
         print(f'FOLD {fold}')
         print('--------------------------------')
         
-        # Sample elements randomly from a given list of ids, no replacement.
-        # train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
-        # test_subsampler = torch.utils.data.SubsetRandomSampler(test_ids)
             
-        # Define data loaders for training and testing data in this fold
-        # trainloader = torch.utils.data.DataLoader(
-        #                 dataset, 
-        #                 batch_size=10, sampler=train_subsampler)
-        # testloader = torch.utils.data.DataLoader(
-        #                 dataset,
-        #                 batch_size=10, sampler=test_subsampler)
+
         
         # Init the neural network
         # network = SimpleConvNet() # -> Need to modify
@@ -463,7 +452,7 @@ if __name__ == '__main__':
                                                len(dataset.iloc[valid_ids])
                                               )
             if epoch > num_epochs-5 and epoch < num_epochs:
-                # 에폭 - 5 전과 에폭 끝나기 직전은 저장 X -> 속도 올려줄거임
+                # 에폭 - 5 전과 에폭 끝나기 직전은 저장 X 
                 if validate_acc > max_acc:
                     print('update model')
                     save_path = f'./model-fold-{fold}.pth'
@@ -486,12 +475,6 @@ if __name__ == '__main__':
         # Print about testing
     print('Starting testing')
     
-    # tokenizer = AutoTokenizer.from_pretrained("klue/roberta-large", padding_side = 'left')
-    # feature_extractor = ViTFeatureExtractor.from_pretrained('google/vit-large-patch32-384')
-    # model = TourClassifier(n_classes3 = 128,
-                            # text_model_name = 'klue/roberta-large',
-                            # image_model_name = 'google/vit-large-patch32-384'
-                            # ).to(device)
     test = pd.read_csv(f'{data_path}test.csv')
 
     saved_model_list = [file for file in os.listdir(data_path) if file.endswith('pt')]
@@ -517,7 +500,6 @@ if __name__ == '__main__':
             submission.loc[arr,'cat3'] = le.classes_[preds_arr3[arr][0]]
         submission.to_csv(f'{data_path}/{s[:-3]}_submission.csv')
         print(f"complete saving {s}'s submission file")
-        # Saving the model
-################################################################
-        # Evaluationfor this fold
+
+
     
